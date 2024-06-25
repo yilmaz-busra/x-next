@@ -20,7 +20,7 @@ export default function RootLayout({ children }) {
           </div>
           <div>{children}</div>
 
-          <div className="lg:flex-col p-3 h-screen border-l hidden lg:flex w-[24]">
+          <div className="lg:flex-col p-3 h-screen border-l hidden lg:flex w-[360px]">
             <div className="sticky top-0 bg-white py-2">
               {" "}
               <input
