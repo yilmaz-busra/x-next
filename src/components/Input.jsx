@@ -19,7 +19,7 @@ export default function Input() {
           placeholder="Whats happening"
           rows="2"
         ></textarea>
-        <div className="flex items-center justify-betweenpt-2.5 ">
+        <div className="flex items-center justify-between pt-2.5 ">
           <HiOutlinePhotograph className="h-10 w-10 p-2 text-sky-500 hover:gb-sky-100 rounded-full cursor-pointer" />
           <button
             disabled
