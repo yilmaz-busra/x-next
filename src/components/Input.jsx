@@ -80,6 +80,7 @@ export default function Input() {
     setText("");
     setImageFileUrl(null);
     setSelectedFile(null);
+    location.reload(); //page refresh
   };
   const { data: session } = useSession();
   if (!session) return null;
