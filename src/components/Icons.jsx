@@ -78,7 +78,7 @@ function Icons({ id, uid }) {
         {isLiked ? (
           <HiHeart
             onClick={likePost}
-            className="h-8 w-8 p-2 cursor-pointer rounded-full transition duration-500 ease-in-out hover:text-red-500 hover:bg-red-100"
+            className="h-8 w-8 p-2 cursor-pointer rounded-full transition duration-500 ease-in-out text-red-300 hover:text-red-500 hover:bg-red-100"
           />
         ) : (
           <HiOutlineHeart
