@@ -12,6 +12,7 @@ import {
   onSnapshot,
   addDoc,
   serverTimestamp,
+  collection,
 } from "firebase/firestore";
 import { useRouter } from "next/navigation";
 
@@ -22,7 +23,7 @@ export default function CommentModel() {
   const [input, setInput] = useState(""); // [2
   const { data: session } = useSession();
   const db = getFirestore(app);
-
+  const router = useRouter();
   useEffect(() => {
     if (postId !== "") {
       const postRef = doc(db, "posts", postId);
@@ -38,16 +39,17 @@ export default function CommentModel() {
   }, [postId]);
 
   const sendComment = async () => {
-    addDoc(doc(db, "posts", postId, "comments"), {
+    addDoc(collection(db, "posts", postId, "comments"), {
       name: session.user.name,
-      image: session.user.image,
-      text: input,
+      username: session.user.username,
+      userImg: session.user.image,
+      comment: input,
       timestamp: serverTimestamp(),
     })
       .then(() => {
         setInput("");
         setOpen(false);
-        router.push(`/post/${postId}`);
+        router.push(`/posts/${postId}`);
       })
       .catch((error) => {
         console.error("Error adding document: ", error);
