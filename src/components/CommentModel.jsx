@@ -6,7 +6,15 @@ import { HiX } from "react-icons/hi";
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 import { app } from "@/firebase";
-import { getFirestore, doc, onSnapshot } from "firebase/firestore";
+import {
+  getFirestore,
+  doc,
+  onSnapshot,
+  addDoc,
+  serverTimestamp,
+} from "firebase/firestore";
+import { useRouter } from "next/navigation";
+
 export default function CommentModel() {
   const [open, setOpen] = useRecoilState(modalState);
   const [postId, setPostId] = useRecoilState(postIdState);
@@ -29,7 +37,22 @@ export default function CommentModel() {
     }
   }, [postId]);
 
-  const sendComment = async () => {};
+  const sendComment = async () => {
+    addDoc(doc(db, "posts", postId, "comments"), {
+      name: session.user.name,
+      image: session.user.image,
+      text: input,
+      timestamp: serverTimestamp(),
+    })
+      .then(() => {
+        setInput("");
+        setOpen(false);
+        router.push(`/post/${postId}`);
+      })
+      .catch((error) => {
+        console.error("Error adding document: ", error);
+      });
+  };
   return (
     <div>
       {open && (
