@@ -1,9 +1,73 @@
 "use client";
 import Link from "next/link";
-import { HiDotsHorizontal } from "react-icons/hi";
+import { app } from "../firebase";
+import { HiDotsHorizontal, HiHeart, HiOutlineHeart } from "react-icons/hi";
 import Icons from "./Icons";
+import { useEffect, useState } from "react";
+import {
+  Timestamp,
+  collection,
+  deleteDoc,
+  doc,
+  getFirestore,
+  onSnapshot,
+  serverTimestamp,
+  setDoc,
+} from "firebase/firestore";
+import { signIn, useSession } from "next-auth/react";
 
-function Comment({ comment, id }) {
+function Comment({ comment, commentId, originalPostId }) {
+  const [isLiked, setIsLiked] = useState(false);
+  const [likes, setLikes] = useState([]);
+  const db = getFirestore(app);
+  const { data: session } = useSession();
+  const likePost = async () => {
+    if (session) {
+      if (isLiked) {
+        await deleteDoc(
+          doc(
+            db,
+            "posts",
+            originalPostId,
+            "comments",
+            commentId,
+            "likes",
+            session.user.uid
+          )
+        );
+      } else {
+        await setDoc(
+          doc(
+            db,
+            "posts",
+            originalPostId,
+            "comments",
+            commentId,
+            "likes",
+            session.user.uid
+          ),
+          {
+            username: session.user.username,
+            Timestamp: serverTimestamp(),
+          }
+        );
+      }
+    } else {
+      signIn();
+    }
+  };
+  useEffect(() => {
+    onSnapshot(
+      collection(db, "posts", originalPostId, "comments", commentId, "likes"),
+      (snapshot) => {
+        setLikes(snapshot.docs);
+      }
+    );
+  }, [db]);
+
+  useEffect(() => {
+    setIsLiked(likes.findIndex((like) => like.id === session?.user.uid) !== -1);
+  }, [likes]);
   return (
     <div className="flex p-3 border-b border-gray-20 hover:bg-gray-50 pl-10">
       <img
@@ -21,6 +85,24 @@ function Comment({ comment, id }) {
         </div>
 
         <p className="text-xs my-3 text-gray-900">{comment?.comment}</p>
+        <div className="flex items-center">
+          {isLiked ? (
+            <HiHeart
+              onClick={likePost}
+              className="h-8 w-8 p-2 cursor-pointer rounded-full transition duration-500 ease-in-out text-red-300 hover:text-red-500 hover:bg-red-100"
+            />
+          ) : (
+            <HiOutlineHeart
+              onClick={likePost}
+              className="h-8 w-8 p-2 cursor-pointer rounded-full transition duration-500 ease-in-out  hover:text-red-500 hover:bg-red-100"
+            />
+          )}
+          {likes.length > 0 && (
+            <span className={`text-xs ${isLiked && "text-red-600"}`}>
+              {likes.length}
+            </span>
+          )}
+        </div>
       </div>
     </div>
   );
